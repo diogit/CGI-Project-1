@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+varying vec2 fPosition;
+void main(){
+	fPosition.x = vPosition.x;
+	fPosition.y = vPosition.y;
+    gl_Position = vPosition;
+}
+</script>
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying vec2 fPosition;
+uniform vec2 center;
+uniform float scale;
+uniform float factor;
+uniform bool isJulia;
+uniform vec2 c;
+float fractal(vec2 z0, vec2 c){
+	vec2 z = z0;
+	float j = 0.0;
+	for (int i = 0; i<100; i++){
+		j++;
+		
+
+		//z = z*z + c;
+		z = vec2(z.x*z.x-z.y*z.y, z.y*z.x+z.x*z.y);
+		z = vec2(z.x+c.x, z.y+c.y);
+
+		if ((z.x*z.x + z.y*z.y) > 4.0){
+			break;
+		}
+	}
+
+	if (j == 100.0){
+		return 0.0;
+	} else {
+		return j;
+	}
+}
+vec3 paletize(float v, float factor){
+    float vv = v*factor;
+    if (vv == 0.0){
+    	return vec3(0.0, 0.0, 0.0);
+    } else {
+    	return vec3(sin(vv/3.0), cos(vv/6.0), cos(vv/(12.0+3.14/4.0)));
+    }    
+}
+void main() {
+	vec2 p = vec2((fPosition.x/scale+center.x), (fPosition.y/scale+center.y));
+
+    if (isJulia){
+    	gl_FragColor.rgb = paletize(fractal(p, c), factor);
+    } else {
+    	gl_FragColor.rgb = paletize(fractal(vec2(0.0, 0.0), p), factor);
+    }
+    gl_FragColor.a = 1.0;
+}
+</script>
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="fractals.js"></script>
+<style>
+body{
+	background: #e0e0e0;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+.noselect {
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;
+}
+
+#content{
+	background: #ffffff;
+	width: 514px;
+	margin: 0 auto;
+	border: 1px solid black;
+	cursor: default;
+}
+
+.title{
+	border: 1px solid black;
+	text-align: center;
+}
+
+.displaySubRow{
+	display: table-row;
+}
+
+.display{
+	display: table-cell;
+	border: 1px solid black;
+	text-align: center;
+}
+
+.displaySub{
+	display: table-cell;
+}
+
+.small{
+	display: table-cell;
+	height: 32px;
+	width: 32px;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.small:hover{
+	background: rgba(0,100,255,0.20);
+}
+
+#gl-canvas{
+	display: block;
+	background: #ffffff;
+	border: 1px solid black;
+	cursor: move;
+}
+
+.authors{
+	border: 1px solid black;
+	padding: 5px;
+}
+</style>
+<title>Fractal Viewer</title>
+</head>
+<body>
+	<div id="content" class="noselect">
+		<div class="title"><h3>Fractal Viewer</h3></div>
+		<div>
+			<div class="display">
+				<div class="displaySubRow">
+					<div class="small" id="up" title="Move Up">&#x25B2;</div>
+				    <div class="small" id="left" title="Move Left">&#x25C4;</div>
+					<div class="small" id="right" title="Move Right">&#x25BA;</div>
+				</div>
+				<div class="displaySubRow">
+				    <div class="small" id="down" title="Move Down">&#x25BC;</div>
+					<div class="small" id="zoomIn" title="Zoom In">&#x2B;</div>
+					<div class="small" id="zoomOut" title="Zoom Out">&#x2212;</div>
+			    </div>
+			</div>
+		    <div class="display">
+				<b>Factor:</b>
+				<input id="slide" type="range" min="0.01" max="2" step="0.01" value="1"/>
+			</div>
+			<div class="display">
+				<b>Fractal type:</b>
+				<select id="fractalType">
+				    <option value="0">Mandelbrot</option>
+				    <option value="1">Julia c=-0.4+0.6i</option>
+				    <option value="2">Julia c=0.285+0i</option>
+				    <option value="3">Julia c=0.285+0.01i</option>
+				    <option value="4">Julia c=-0.8+0.156i</option>
+				    <option value="5">Julia c=0.8+0i</option>
+				</select>
+			</div>
+		</div>
+		<canvas id="gl-canvas" width="512" height="512">
+	        Oops... your browser doesn't support the HTML5 canvas element"
+	    </canvas>
+		<div class="authors">
+			<b>Authors:</b> Daniel Flamino (45465), Diogo Silvério (45679)
+		</div>
+	</div>
+</body>
+</html>
