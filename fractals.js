@@ -21,7 +21,7 @@ window.onload = function init() {
     canvas.addEventListener("mousemove", onMouseMove);
     window.addEventListener("keydown", onKeyDown);
     document.getElementById("slide").addEventListener("input", onSlide);
-	m.addEventListener("click", onFractalTypeSelect);
+	m.addEventListener("change", onFractalTypeSelect);
     document.getElementById("up").addEventListener("click", onUpButtonClick);
     document.getElementById("down").addEventListener("click", onDownButtonClick);
     document.getElementById("left").addEventListener("click", onLeftButtonClick);
